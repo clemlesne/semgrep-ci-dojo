@@ -1,11 +1,9 @@
 name: Semgrep full scan
 
 on:
-  workflow_dispatch:
+  push:
     branches:
       - main
-  schedule:
-    - pull_request
 
 jobs:
   semgrep-full:
