@@ -1,0 +1,37 @@
+name: Semgrep full scan
+
+on:
+  workflow_dispatch:
+    branches:
+      - main
+  schedule:
+    - cron: "0 1 * * 6"
+
+jobs:
+  semgrep-full:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: src
+
+    steps:
+      - name: clone application source code
+        uses: actions/checkout@v3
+
+      - name: scan source code
+        uses: docker://returntocorp/semgrep
+        with:
+          args: semgrep --sarif --output report.sarif --metrics=off --config="p/default" .
+
+      - name: save report
+        uses: actions/upload-artifact@v3
+        with:
+          name: report.sarif
+          path: report.sarif
+
+      - name: publish findings
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: report.sarif
+          category: semgrep
