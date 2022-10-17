@@ -5,7 +5,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: "0 1 * * 6"
+    - pull_request
 
 jobs:
   semgrep-full:
@@ -16,21 +16,21 @@ jobs:
         working-directory: src
 
     steps:
-      - name: clone application source code
+      - name: Clone application source code
         uses: actions/checkout@v3
 
-      - name: scan source code
+      - name: Scan source code
         uses: docker://returntocorp/semgrep
         with:
           args: semgrep --sarif --output report.sarif --metrics=off --config="p/default" .
 
-      - name: save report
+      - name: Save report
         uses: actions/upload-artifact@v3
         with:
           name: report.sarif
           path: report.sarif
 
-      - name: publish findings
+      - name: Publish findings
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: report.sarif
